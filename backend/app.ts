@@ -5,6 +5,8 @@ import path from "path";
 import { config } from "dotenv";
 import { connectDb } from "./config/db";
 import userRoutes from "./routes/users"
+import commentRoutes from "./routes/comment"
+import livreRoutes from "./routes/livre"
 config({
   path: path.join(process.cwd(), ".env.local"),
 });
@@ -27,3 +29,5 @@ connectDb()
   });
 
 app.use("/user",userRoutes)
+app.use("/livre",livreRoutes)
+app.use("/comment",commentRoutes)
