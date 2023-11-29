@@ -135,7 +135,7 @@ class UserController {
 
       if (exist && (await compareMdpHash(password, exist.password))) {
         res.cookie("token", generateToken(exist.toObject()));
-
+         console.log(generateToken(exist.toObject()))
         return res
           .status(200)
           .json({ statut: true, message: { ...exist.toObject() } });
