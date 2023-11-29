@@ -1,7 +1,6 @@
 import { Router} from "express";
 import UserController from "../controllers/users";
 import Auth from "../middlewares/auth";
-import { User } from "../models/users";
 const router = Router();
 
 router.get("/:id", UserController.getUser);
