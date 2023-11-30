@@ -28,6 +28,6 @@ connectDb()
     console.log(e.message);
   });
 
-app.use("/user",userRoutes)
-app.use("/livre",livreRoutes)
-app.use("/comment",commentRoutes)
+app.use("/api/user",userRoutes)
+app.use("/api/livre",livreRoutes)
+app.use("/api/comment",commentRoutes)

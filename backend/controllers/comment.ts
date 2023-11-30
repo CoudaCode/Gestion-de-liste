@@ -7,7 +7,7 @@ class CommentControllers {
   static async createComment(req: AuthRequest, res: Response) {
     try {
       const auth: IUser = req.auth as IUser;
-      const { auteur, ...body } = req.body;
+      const { livreID,auteur, ...body } = req.body;
 
       const newComment = await Comment.create({
         auteur: auth._id,
@@ -15,7 +15,7 @@ class CommentControllers {
       });
 
       await Livre.findOneAndUpdate(
-        { _id: auth._id },
+        { _id:livreID },
         {
           $push: {
             comment: {
@@ -29,7 +29,6 @@ class CommentControllers {
           statut: false,
           message: "Erreur lors de la creation du commentaire",
         });
-
       res
         .status(201)
         .json({ statut: false, message: { ...newComment.toObject() } });

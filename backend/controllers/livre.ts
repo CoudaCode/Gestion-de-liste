@@ -21,6 +21,16 @@ class LivreControllers {
         ...body,
       });
 
+      await User.findOneAndUpdate(
+        { _id: auth._id },
+        {
+          $push: {
+            livre: {
+              $each: [`${newLivre._id}`],
+            },
+          },
+        }
+      );
       res
         .status(201)
         .json({ statut: true, message: { ...newLivre.toObject() } });
@@ -85,13 +95,17 @@ class LivreControllers {
       const id: string = req.params.id;
       const auth: IUser = req.auth as IUser;
       const exist = await Livre.findById(id);
-
-      if (exist && auth._id === exist._id) {
-        return res.status(200).json({ statut: true, message: { ...exist } });
+      console.log("exist", exist);
+      console.log("auth", auth);
+      console.log(exist && auth._id == exist.auteur);
+      if (exist && auth._id == exist.auteur) {
+        return res
+          .status(200)
+          .json({ statut: true, message: { ...exist.toObject() } });
       }
       res.status(400).json({
         statut: false,
-        message: "Vos n'êtes pas autorisé",
+        message: "Vous n'êtes pas autorisé",
       });
     } catch (e: any) {
       if (e instanceof Error) {
@@ -112,10 +126,10 @@ class LivreControllers {
           message: "Ya pas livre ",
         });
 
-        res.status(200).json({
-            statut: false,
-            message: {...allLivre},
-          });
+      res.status(200).json({
+        statut: true,
+        message: { ...allLivre },
+      });
     } catch (e: any) {
       if (e instanceof Error) {
         res.status(500).json({ statut: false, message: e.message });

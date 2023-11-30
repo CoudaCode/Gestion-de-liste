@@ -118,7 +118,12 @@ class UserController {
           .status(400)
           .json({ statut: false, message: "ce user n'existe pas" });
 
-      res.status(200).json({ statut: true, message: { ...user.toObject() } });
+      res
+        .status(200)
+        .json({
+          statut: true,
+          message: { ...user.toObject(), password: undefined },
+        });
     } catch (e: any) {
       if (e instanceof Error) {
         res.status(500).json({ statut: false, message: e.message });
@@ -135,7 +140,7 @@ class UserController {
 
       if (exist && (await compareMdpHash(password, exist.password))) {
         res.cookie("token", generateToken(exist.toObject()));
-         console.log(generateToken(exist.toObject()))
+        console.log(generateToken(exist.toObject()));
         return res
           .status(200)
           .json({ statut: true, message: { ...exist.toObject() } });

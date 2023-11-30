@@ -9,7 +9,6 @@ const Auth = (
   next: NextFunction
 ): Response | void => {
   const token: string | undefined = req.cookies.token || req.headers.authorization?.split(" ")[1];
-  console.log("mon token ", token)
   const isTokenExist =
     typeof token === "string"
       ? tokenVerify(token)

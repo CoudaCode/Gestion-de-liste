@@ -4,7 +4,7 @@ import Auth from "../middlewares/auth";
 
 const router = Router()
 
-router.get("/:id", Auth, LivreControllers.createLivre)
+router.get("/:id", Auth, LivreControllers.getLivre)
 router.get("/",Auth, LivreControllers.getAllLivre)
 router.post("/", Auth, LivreControllers.createLivre)
 router.put("/:id", Auth, LivreControllers.updateLivre)

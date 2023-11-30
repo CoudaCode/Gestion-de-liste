@@ -20,7 +20,7 @@ const CommentModel = new Schema <IComment>({
         },
         dateAjout: {
             type:Date,
-            defaut: Date.now()
+            defaut: Date.now
         }
 })
 
