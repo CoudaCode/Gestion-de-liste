@@ -17,7 +17,6 @@ type MailOptions = {
     html:string;
   };
 
-
 const sendEmail = (mailOptions: MailOptions) => {
     return transporter.sendMail(mailOptions, function (error, info) {
         if (error) {

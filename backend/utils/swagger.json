@@ -1,0 +1,250 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TodoList API a consommer avec modération",
+    "description": "Cette API permet de gérer des utilisateurs et leurs tâches à consommer avec modération.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/users/": {
+      "post": {
+        "summary": "Création d'un nouveau utilisateur",
+        "description": "Crée un nouvel utilisateur dans la base de données.",
+        "responses": {
+          "200": {
+            "description": "Inscription réussie avec retour de l'utilisateur créé.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 1,
+                  "fullname": "John Doe",
+                  "email": "johndoe@example.com",
+                  "password": ".........."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ce email existe déjà."
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupération des utilisateurs dans la base de données",
+        "description": "Récupère la liste des utilisateurs créés dans la base de données.",
+        "responses": {
+          "200": {
+            "description": "Récupération réussie avec retour du tableau des utilisateurs créés.",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": 1,
+                    "fullname": "John Doe",
+                    "email": "johndoe@example.com",
+                    "password": "................"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur lors de la récupération."
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Récupération d'un utilisateur en fonction de l'ID",
+        "description": "Récupère un utilisateur en fonction de son ID spécifique.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID unique de l'utilisateur à récupérer."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retourne l'utilisateur correspondant à l'ID spécifié.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 1,
+                  "fullname": "John Doe",
+                  "email": "johndoe@example.com",
+                  "password": ".........."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Utilisateur non trouvé."
+          }
+        }
+      },
+      "put": {
+        "summary": "Modifie un utilisateur en fonction de l'ID",
+        "description": "Modifie un utilisateur en fonction de son ID spécifique.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID unique de l'utilisateur à modifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bien modifié !"
+          },
+          "400": {
+            "description": "Erreur lors de la modification."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprime un utilisateur en fonction de l'ID",
+        "description": "Supprime un utilisateur en fonction de son ID spécifique.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID unique de l'utilisateur à supprimer."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bien supprimé."
+          },
+          "400": {
+            "description": "Erreur lors de la suppression."
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "summary": "Connexion de l'utilisateur avec email et mot de passe",
+        "description": "Permet à un utilisateur de se connecter en utilisant son email et son mot de passe.",
+        "responses": {
+          "200": {
+            "description": "Connexion réussie."
+          },
+          "400": {
+            "description": "Email ou mot de passe incorrect."
+          }
+        }
+      }
+    },
+    "/api/taches/": {
+      "post": {
+        "summary": "Création d'une nouvelle tâche en fonction de l'utilisateur",
+        "description": "Crée une nouvelle tâche pour l'utilisateur connecté.",
+        "responses": {
+          "200": {
+            "description": "Tâche bien créée avec l'ID de l'utilisateur connecté."
+          },
+          "400": {
+            "description": "Erreur lors de la création."
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupération des tâches de l'utilisateur connecté dans la base de données",
+        "description": "Récupère la liste des tâches de l'utilisateur connecté dans la base de données.",
+        "responses": {
+          "200": {
+            "description": "Bien récupéré."
+          },
+          "400": {
+            "description": "Erreur lors de la récupération."
+          }
+        }
+      }
+    },
+    "/api/taches/{id}": {
+      "get": {
+        "summary": "Récupération d'une tâche en fonction de l'ID",
+        "description": "Récupère une tâche en fonction de son ID spécifique.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID unique de la tâche à récupérer."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retourne la tâche correspondant à l'ID spécifié."
+          },
+          "400": {
+            "description": "Tâche non trouvée."
+          }
+        }
+      },
+      "put": {
+        "summary": "Modifie une tâche en fonction de l'ID",
+        "description": "Modifie une tâche en fonction de son ID spécifique.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID unique de la tâche à modifier."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bien modifié !"
+          },
+          "400": {
+            "description": "Erreur lors de la modification."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprime une tâche en fonction de l'ID",
+        "description": "Supprime une tâche en fonction de son ID spécifique.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID unique de la tâche à supprimer."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bien supprimé."
+          },
+          "400": {
+            "description": "Erreur lors de la suppression."
+          }
+        }
+      }
+    }
+  }
+}
