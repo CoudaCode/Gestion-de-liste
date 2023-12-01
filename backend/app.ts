@@ -18,16 +18,16 @@ app.use(express.static("public"));
 app.use(cookieParser());
 app.use(cors());
 
+
 connectDb()
   .then(() => {
     app.listen(3000, () => {
-      console.log("bien connect a la db mongo");
+      console.log("bien connecté au port 3000");
     });
   })
   .catch((e) => {
     console.log(e.message);
   });
-
-app.use("/api/user",userRoutes)
-app.use("/api/livre",livreRoutes)
-app.use("/api/comment",commentRoutes)
+    app.use("/api/user",userRoutes)
+    app.use("/api/livre",livreRoutes)
+    app.use("/api/comment",commentRoutes)

@@ -3,6 +3,7 @@ import { User, IUser } from "./../models/users";
 import { compareMdpHash, hasHMdp } from "../utils/Hash";
 import { generateToken } from "../utils/token";
 import { AuthRequest } from "../interface/authRequest";
+import { sendEmail, MailOptions } from "../utils/sendMail";
 class UserController {
   static async createUser(req: Request, res: Response) {
     try {
@@ -118,12 +119,10 @@ class UserController {
           .status(400)
           .json({ statut: false, message: "ce user n'existe pas" });
 
-      res
-        .status(200)
-        .json({
-          statut: true,
-          message: { ...user.toObject(), password: undefined },
-        });
+      res.status(200).json({
+        statut: true,
+        message: { ...user.toObject(), password: undefined },
+      });
     } catch (e: any) {
       if (e instanceof Error) {
         res.status(500).json({ statut: false, message: e.message });
@@ -140,7 +139,6 @@ class UserController {
 
       if (exist && (await compareMdpHash(password, exist.password))) {
         res.cookie("token", generateToken(exist.toObject()));
-        console.log(generateToken(exist.toObject()));
         return res
           .status(200)
           .json({ statut: true, message: { ...exist.toObject() } });
@@ -148,6 +146,51 @@ class UserController {
       res
         .status(400)
         .json({ statut: false, message: "email ou mot de passe incorrect" });
+    } catch (e: any) {
+      if (e instanceof Error) {
+        res.status(500).json({ statut: false, message: e.message });
+      } else {
+        res.status(500).json({ statut: false, message: "An error occurred" });
+      }
+    }
+  }
+  static async forgetPassword(req: AuthRequest, res: Response) {
+    try {
+      const { email, boddy } = req.body;
+      if (!req.body.email) {
+        return res.status(400).json({
+          statut: false,
+          message: "L'adresse e-mail doit être fournie",
+        });
+      }
+      const user: IUser | null = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({
+          statut: false,
+          message: "L'utilisateur avec l'adresse e-mail fournie n'existe pas",
+        });
+      }
+
+      await User.updateOne(
+        { _id: user._id },
+        { password: await hasHMdp(req.body.password) }
+      );
+      const myEmail: string = process.env.email || '';
+      const resetPasswordEmail: MailOptions = {
+        from: myEmail,
+        to: user.email,
+        subject: "Réinitialisation du mot de passe",
+        html: `
+          <p>Veuillez vous connecter avec votre nouveau mot de passe lors de votre prochaine visite.</p>
+          <a href="/">Accueil</a>
+        `,
+      };
+
+      await sendEmail(resetPasswordEmail);
+      res.status(200).json({
+        statut: true,
+        message: "Un e-mail de réinitialisation du mot de passe a été envoyé",
+      });
     } catch (e: any) {
       if (e instanceof Error) {
         res.status(500).json({ statut: false, message: e.message });

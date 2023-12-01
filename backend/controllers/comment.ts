@@ -7,15 +7,16 @@ class CommentControllers {
   static async createComment(req: AuthRequest, res: Response) {
     try {
       const auth: IUser = req.auth as IUser;
-      const { livreID,auteur, ...body } = req.body;
+      const { livreID, auteur, ...body } = req.body;
 
       const newComment = await Comment.create({
         auteur: auth._id,
+        livreID,
         ...body,
       });
 
       await Livre.findOneAndUpdate(
-        { _id:livreID },
+        { _id: livreID },
         {
           $push: {
             comment: {
@@ -42,17 +43,17 @@ class CommentControllers {
   }
   static async updateComment(req: AuthRequest, res: Response) {
     try {
-      const { ...body } = req.body;
+      const { content, ...body } = req.body;
 
       const auth: IUser = req.auth as IUser;
       const id: string = req.params.id;
       const exist = await Comment.findById(id);
 
       if (exist && exist.auteur == auth._id) {
-        const updateComment = await Livre.updateOne({ _id: id }, { ...body });
+        await Comment.updateOne({ _id: id }, { content, ...body });
         return res.status(200).json({
           statut: true,
-          message: { ...updateComment },
+          message: "Bien Modifié !!!",
         });
       }
 
@@ -75,9 +76,9 @@ class CommentControllers {
       const exist = await Comment.findById(id);
 
       if (exist && exist.auteur == auth._id) {
-        const deleteComment = await Comment.deleteOne({ _id: id });
+        await Comment.deleteOne({ _id: id });
         return res
-          .status(204)
+          .status(200)
           .json({ statut: true, message: "Suppression avec succès" });
       }
       res.status(400).json({
@@ -94,16 +95,21 @@ class CommentControllers {
   }
   static async getComment(req: AuthRequest, res: Response) {
     try {
-      const auth: IUser = req.auth as IUser;
       const id: string = req.params.id;
-      const exist = await Comment.findById(id);
+      const exist = await Comment.findById(id).populate(
+        "auteur",
+        "fullname username"
+      );
 
-      if (exist && exist.auteur == auth._id) {
-        return res.status(204).json({ statut: true, message: { ...exist } });
+      if (exist) {
+        return res
+          .status(200)
+          .json({ statut: true, message: { ...exist.toObject() } });
       }
-      res.status(400).json({
+
+      res.status(404).json({
         statut: false,
-        message: "Vous n'êtes autorisé à supprimé ce commentaire ",
+        message: "Commentaire introuvable",
       });
     } catch (e: any) {
       if (e instanceof Error) {
@@ -113,17 +119,22 @@ class CommentControllers {
       }
     }
   }
-  static async getAllComment(req: AuthRequest, res: Response) {
+  static async getAllComment(req: Request, res: Response) {
     try {
-      const auth: IUser = req.auth as IUser;
-      const exist = await Comment.find({ auteur: auth._id });
+      const exist = await Comment.find({}).populate(
+        "auteur",
+        "fullname username"
+      );
 
-      if (auth) {
-        return res.status(200).json({ statut: true, message: { ...exist } });
+      if (exist) {
+        return res
+          .status(200)
+          .json({ statut: true, message: { ...exist } });
       }
-      res.status(400).json({
+
+      res.status(404).json({
         statut: false,
-        message: "Vous n'êtes autorisé à supprimé ce commentaire ",
+        message: "Commentaire introuvable",
       });
     } catch (e: any) {
       if (e instanceof Error) {

@@ -8,4 +8,5 @@ router.post("/", UserController.createUser);
 router.put("/:id", Auth , UserController.updateUser);
 router.delete("/:id", Auth, UserController.deleteUser)
 router.post("/login", UserController.login)
+router.post("/reset-forget", UserController.forgetPassword)
 export default router;

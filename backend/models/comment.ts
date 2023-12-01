@@ -5,6 +5,7 @@ interface IComment extends Document {
     auteur : Types.ObjectId | string; 
     content: string;
     dateAjout: Date;
+    livreID:string;
 }
 
 
@@ -17,6 +18,10 @@ const CommentModel = new Schema <IComment>({
         content: {
             type: String,
             required: true
+        },
+        livreID: {
+            required: true,
+            type:String
         },
         dateAjout: {
             type:Date,

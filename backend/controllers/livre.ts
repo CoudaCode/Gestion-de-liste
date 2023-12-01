@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Livre, ILivre } from "./../models/livre";
 import { AuthRequest } from "../interface/authRequest";
 import { User, IUser } from "./../models/users";
+import { Comment } from "../models/comment";
 class LivreControllers {
   static async createLivre(req: AuthRequest, res: Response) {
     try {
@@ -48,7 +49,7 @@ class LivreControllers {
       const auth: IUser = req.auth as IUser;
       const exist = await Livre.findById(id);
 
-      if (exist && auth._id === exist.auteur) {
+      if (exist && auth._id == exist.auteur) {
         const editLivre = await Livre.updateOne({ _id: id }, { ...req.body });
         return res
           .status(201)
@@ -72,7 +73,7 @@ class LivreControllers {
       const auth: IUser = req.auth as IUser;
       const exist = await Livre.findById(id);
 
-      if (exist && auth._id === exist.auteur) {
+      if (exist && auth._id == exist.auteur) {
         await Livre.deleteOne({ _id: id });
         return res
           .status(201)
@@ -94,10 +95,7 @@ class LivreControllers {
     try {
       const id: string = req.params.id;
       const auth: IUser = req.auth as IUser;
-      const exist = await Livre.findById(id);
-      console.log("exist", exist);
-      console.log("auth", auth);
-      console.log(exist && auth._id == exist.auteur);
+      const exist = await Livre.findById(id).populate("comment","content");
       if (exist && auth._id == exist.auteur) {
         return res
           .status(200)
@@ -115,10 +113,9 @@ class LivreControllers {
       }
     }
   }
-  static async getAllLivre(req: AuthRequest, res: Response) {
+  static async getAllLivre(req: Request, res: Response) {
     try {
-      const auth: IUser = req.auth as IUser;
-      const allLivre = await Livre.find({ auteur: auth._id });
+      const allLivre = await Livre.find({}).populate("comment","content");
 
       if (!allLivre)
         return res.status(400).json({
@@ -129,6 +126,41 @@ class LivreControllers {
       res.status(200).json({
         statut: true,
         message: { ...allLivre },
+      });
+    } catch (e: any) {
+      if (e instanceof Error) {
+        res.status(500).json({ statut: false, message: e.message });
+      } else {
+        res.status(500).json({ statut: false, message: "An error occurred" });
+      }
+    }
+  }
+
+  static async getCommentsForLivre(req: AuthRequest, res: Response) {
+    try {
+      const auth: IUser = req.auth as IUser;
+      const livreId: string = req.params.id;
+
+      // Check if the user has permission to view comments for this Livre
+      const hasPermission = await Livre.exists({
+        _id: livreId,
+        auteur: auth._id,
+      });
+
+      if (!hasPermission) {
+        return res.status(403).json({
+          statut: false,
+          message:
+            "Vous n'êtes pas autorisé à voir les commentaires de ce livre",
+        });
+      }
+
+      // Retrieve comments for the specified Livre
+      const comments = await Comment.find({ livreID: livreId }).populate("auteur","fullname username");
+
+      res.status(200).json({
+        statut: true,
+        message: { comments },
       });
     } catch (e: any) {
       if (e instanceof Error) {
