@@ -1,12 +1,12 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "TodoList API a consommer avec modération",
-    "description": "Cette API permet de gérer des utilisateurs et leurs tâches à consommer avec modération.",
+    "title": "Un api de gestion de livre",
+    "description": "Cette API créer des livre, le modifier, le supprimer, ajouter un commentaire",
     "version": "1.0.0"
   },
   "paths": {
-    "/api/users/": {
+    "/api/user/": {
       "post": {
         "summary": "Création d'un nouveau utilisateur",
         "description": "Crée un nouvel utilisateur dans la base de données.",
@@ -19,7 +19,10 @@
                   "id": 1,
                   "fullname": "John Doe",
                   "email": "johndoe@example.com",
-                  "password": ".........."
+                  "password": "..........",
+                  "username":"lorenzo",
+                  "contact":1425368,
+                  "livre":["Le sentier de la reussite", "Pont pied"]
                 }
               }
             }
@@ -41,8 +44,11 @@
                   {
                     "id": 1,
                     "fullname": "John Doe",
+                    "username":"lorenzo",
+                    "contact":1425368,
                     "email": "johndoe@example.com",
-                    "password": "................"
+                    "password": "................",
+                    "livre":["Le sentier de la reussite", "Pont pied"]
                   }
                 ]
               }
@@ -54,7 +60,7 @@
         }
       }
     },
-    "/api/users/{id}": {
+    "/api/user/{id}": {
       "get": {
         "summary": "Récupération d'un utilisateur en fonction de l'ID",
         "description": "Récupère un utilisateur en fonction de son ID spécifique.",
@@ -64,7 +70,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer"
+              "type": "string"
             },
             "description": "ID unique de l'utilisateur à récupérer."
           }
@@ -77,8 +83,11 @@
                 "example": {
                   "id": 1,
                   "fullname": "John Doe",
+                  "username":"lorenzo",
+                  "contact":1425368,
                   "email": "johndoe@example.com",
-                  "password": ".........."
+                  "password": "..........",
+                  "livre":["Le sentier de la reussite","demo"]
                 }
               }
             }
@@ -97,7 +106,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer"
+              "type": "string"
             },
             "description": "ID unique de l'utilisateur à modifier."
           }
@@ -120,7 +129,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer"
+              "type": "string"
             },
             "description": "ID unique de l'utilisateur à supprimer."
           }
@@ -135,7 +144,7 @@
         }
       }
     },
-    "/api/users/login": {
+    "/api/user/login": {
       "post": {
         "summary": "Connexion de l'utilisateur avec email et mot de passe",
         "description": "Permet à un utilisateur de se connecter en utilisant son email et son mot de passe.",
@@ -149,10 +158,10 @@
         }
       }
     },
-    "/api/taches/": {
+    "/api/livre/": {
       "post": {
-        "summary": "Création d'une nouvelle tâche en fonction de l'utilisateur",
-        "description": "Crée une nouvelle tâche pour l'utilisateur connecté.",
+        "summary": "Création d'un nouveau livre",
+        "description": "Crée un nouveau livre pour l'utilisateur connecté.",
         "responses": {
           "200": {
             "description": "Tâche bien créée avec l'ID de l'utilisateur connecté."
@@ -175,7 +184,7 @@
         }
       }
     },
-    "/api/taches/{id}": {
+    "/api/livre/{id}": {
       "get": {
         "summary": "Récupération d'une tâche en fonction de l'ID",
         "description": "Récupère une tâche en fonction de son ID spécifique.",
