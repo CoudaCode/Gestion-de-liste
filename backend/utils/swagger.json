@@ -1,0 +1,215 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de gestion de livres",
+    "description": "Cette API permet de gérer les utilisateurs, les livres et les commentaires.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/user/": {
+      "post": {
+        "summary": "Création d'un nouvel utilisateur",
+        "description": "Crée un nouvel utilisateur dans la base de données.",
+        "x-auth-required": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullname": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "contact": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "fullname",
+                  "username",
+                  "email",
+                  "password",
+                  "contact"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Utilisateur créé avec succès."
+          },
+          "400": {
+            "description": "Erreur lors de la création de l'utilisateur."
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupération des utilisateurs dans la base de données",
+        "description": "Récupère la liste des utilisateurs créés dans la base de données."
+      }
+    },
+    "/api/user/{id}": {
+      "get": {
+        "summary": "Récupération d'un utilisateur en fonction de l'ID",
+        "description": "Récupère un utilisateur en fonction de son ID spécifique."
+      },
+      "put": {
+        "summary": "Modification d'un utilisateur en fonction de l'ID",
+        "description": "Modifie un utilisateur en fonction de son ID spécifique."
+      },
+      "delete": {
+        "summary": "Suppression d'un utilisateur en fonction de l'ID",
+        "description": "Supprime un utilisateur en fonction de son ID spécifique."
+      }
+    },
+    "/api/user/login": {
+      "post": {
+        "summary": "Connexion de l'utilisateur avec email et mot de passe",
+        "description": "Permet à un utilisateur de se connecter en utilisant son email et son mot de passe.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie."
+          },
+          "400": {
+            "description": "Email ou mot de passe incorrect."
+          }
+        }
+      }
+    },
+    "/api/livre/": {
+      "post": {
+        "summary": "Création d'un nouveau livre",
+        "description": "Crée un nouveau livre pour l'utilisateur connecté.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "auteur": {
+                    "type": "string"
+                  },
+                  "genre": {
+                    "type": "string"
+                  },
+                  "pages": {
+                    "type": "integer"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": ["title", "auteur", "genre", "pages", "content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Livre créé avec succès."
+          },
+          "400": {
+            "description": "Erreur lors de la création du livre."
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupération des livres dans la base de données",
+        "description": "Récupère la liste des livres créés dans la base de données."
+      }
+    },
+    "/api/livre/{id}": {
+      "get": {
+        "summary": "Récupération d'un livre en fonction de l'ID",
+        "description": "Récupère un livre en fonction de son ID spécifique."
+      },
+      "put": {
+        "summary": "Modification d'un livre en fonction de l'ID",
+        "description": "Modifie un livre en fonction de son ID spécifique."
+      },
+      "delete": {
+        "summary": "Suppression d'un livre en fonction de l'ID",
+        "description": "Supprime un livre en fonction de son ID spécifique."
+      }
+    },
+    "/api/livres/{id}/comments": {
+      "get": {
+        "summary": "Récupération des commentaires d'un livre en fonction de l'ID",
+        "description": "Récupère les commentaires d'un livre en fonction de son ID spécifique."
+      },
+      "post": {
+        "summary": "Création d'un nouveau commentaire pour un livre",
+        "description": "Crée un nouveau commentaire pour le livre spécifié par son ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID unique du livre pour lequel le commentaire est créé."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": ["content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Commentaire créé avec succès."
+          },
+          "400": {
+            "description": "Erreur lors de la création du commentaire."
+          }
+        }
+      }
+    }
+  }
+}
