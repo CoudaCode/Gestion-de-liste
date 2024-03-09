@@ -2,10 +2,9 @@ import { sign, verify } from "jsonwebtoken";
 
 export const generateToken = (payload: string): string => {
   const jwtSecret: string | undefined = process.env.JWTSECRET;
-
   if (!jwtSecret) throw new Error("Verifié votre code secret token");
   return sign(payload, jwtSecret, {
-    expiresIn: "1h",
+    expiresIn: "10m",
   });
 };
 

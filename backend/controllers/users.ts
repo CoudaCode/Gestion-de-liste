@@ -145,14 +145,16 @@ class UserController {
       const exist: IUser | null = await User.findOne({ email });
 
       if (exist && (await compareMdpHash(password, exist.password))) {
-        res.cookie("token", generateToken(exist.toObject()));
-        return res
-          .status(200)
-          .json({
-            statut: true,
-            message: { ...exist.toObject() },
-            token: generateToken(exist.toObject()),
-          });
+        res.cookie("token", generateToken(exist.toObject()), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        });
+        return res.status(200).json({
+          statut: true,
+          message: { ...exist.toObject() },
+          token: generateToken(exist.toObject()),
+        });
       }
       res
         .status(400)
