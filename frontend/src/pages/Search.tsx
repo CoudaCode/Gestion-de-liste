@@ -3,19 +3,21 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { getAllLivre } from "../api/livre";
 import Input from "../components/Input";
 import Livre from "../components/Livre";
 import { LivreType } from "../types/livre";
+
 const Search: React.FC = () => {
   const router = useNavigate();
 
   const [livres, setLivres] = useState<LivreType[]>([]);
-  const [filterBook, setFilterBook] = useState<LivreType[]>([]);
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<string>("");
 
   const { register, handleSubmit } = useForm();
+
   // Initialisez livres comme un tableau vide
   const token = Cookies.get("usertoken");
 
@@ -27,18 +29,39 @@ const Search: React.FC = () => {
       console.log(error);
     },
   });
-
-  const onSubmit = (data) => {
-    console.log(data);
+  const filterBooks = (searchValue: string) => {
+    if (searchValue) {
+      return livres.filter((livre) =>
+        livre.title.toLowerCase().includes(searchValue.toLowerCase())
+      );
+    }
+    return livres;
   };
+
   useEffect(() => {
     if (!token) {
       router("/login");
     }
-  }, [router, token]);
+
+    const filteredBooks = filterBooks(search);
+    setLivres(filteredBooks);
+  }, [router, token, search]);
+
+  const onSubmit = (data) => {
+    // Validez la valeur de recherche
+    if (!data.search) {
+      // Empêchez la soumission du formulaire
+      toast.error("Veuillez entrer un terme de recherche");
+      return;
+    }
+
+    // Filtrez les livres et mettez à jour l'état
+    const filteredBooks = filterBooks(data.search);
+    setLivres(filteredBooks);
+  };
   return (
     <>
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6">Recherche</h1>
+      <h1 className="mb-6 text-3xl font-semibold text-gray-800">Recherche</h1>
       <div className="flex items-center justify-between">
         <Input
           label="recherche"
@@ -51,14 +74,14 @@ const Search: React.FC = () => {
         />
         <button
           type="submit"
-          onSubmit={handleSubmit(onSubmit)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+          onClick={handleSubmit(onSubmit)}
+          className="px-4 py-2 text-white bg-blue-600 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
         >
           Rechercher
         </button>
       </div>
 
-      <h2 className="text-2xl font-semibold text-gray-800 mt-8 mb-4">
+      <h2 className="mt-8 mb-4 text-2xl font-semibold text-gray-800">
         Résultats
       </h2>
 
