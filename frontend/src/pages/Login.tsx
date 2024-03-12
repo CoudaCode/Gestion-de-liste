@@ -15,43 +15,8 @@ const Login: React.FC = () => {
   const router = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
   const { Login } = useAuth();
+  const { user } = useAuth();
   const { isAuthenticated } = useAuth();
-
-  // const mutation = useMutation(login, {
-  //   onSuccess: (data) => {
-  //     const promise = () =>
-  //       new Promise((resolve) =>
-  //         setTimeout(() => resolve({ name: "Sonner" }), 5000)
-  //       );
-  //     if (data.statut === true) {
-  //       Cookies.set("usertoken", data.token, { expires: 1 });
-  //       toast.promise(promise, {
-  //         loading: "Patientez...",
-  //         success: () => {
-  //           return `Connexion reussie, vous etes connecté`;
-  //         },
-  //         error: "Error",
-  //       });
-
-  //       setTimeout(() => {
-  //         router("/search");
-  //       }, 5000);
-  //     }
-
-  //     if (data.statut === false) {
-  //       toast.error("Email ou mot de passe incorrect", {
-  //         closeButton: true,
-  //         position: "top-center",
-  //       });
-  //     }
-  //   },
-  //   onError: (error) => {
-  //     console.log(error);
-  //     toast.error("Erreur lors de la connexion", {
-  //       closeButton: true,
-  //     });
-  //   },
-  // });
 
   const onSubmit = async (data: LoginFormInputs) => {
     if (data.password === "" || data.email === "") {

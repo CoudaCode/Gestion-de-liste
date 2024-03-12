@@ -13,6 +13,7 @@ type Props = {
 interface AuthContextState {
   user: LoginResponse | null;
   isAuthenticated: boolean;
+  setIsAuthenticated: (value: boolean) => void;
   setUser: (user: LoginResponse | null) => void;
   Login: (data: LoginFormInputs) => Promise<void>;
   signup: (data: SignupFormInputs) => Promise<void>;
@@ -22,6 +23,7 @@ interface AuthContextState {
 const initialState: AuthContextState = {
   user: null,
   isAuthenticated: false,
+  setIsAuthenticated: () => {},
   setUser: () => {},
   Login: async () => {},
   signup: async () => {},
@@ -35,14 +37,10 @@ export const useAuth = () => {
 
 const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = useState<LoginResponse | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  useEffect(() => {
-    const token = Cookies.get("userConnect");
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    initialState.isAuthenticated
+  );
 
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []);
   const Login = async (data: LoginFormInputs) => {
     try {
       const response = await fetch(`${API_URL}/user/login`, {
@@ -89,10 +87,25 @@ const AuthProvider = ({ children }: Props) => {
     setUser(null);
     setIsAuthenticated(false);
   };
+  useEffect(() => {
+    const token = Cookies.get("userConnect");
+    console.log("istoken exits", token);
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, [isAuthenticated]);
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, setUser, Login, signup, logout }}
+      value={{
+        setIsAuthenticated,
+        user,
+        isAuthenticated,
+        setUser,
+        Login,
+        signup,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,23 +1,18 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Input from "../components/Input";
 import { useAuth } from "../context/AuthProvider";
 const Search: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const router = useNavigate();
-  console.log("search", isAuthenticated);
+  console.log(isAuthenticated);
   // const [livres, setLivres] = useState<LivreType[]>([]);
 
   // const [search, setSearch] = useState<string>("");
 
   const { register, handleSubmit } = useForm();
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router("/login");
-    }
-  }, [isAuthenticated, router]);
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
   const onSubmit = (data) => {
     // Validez la valeur de recherche
     if (!data.search) {
