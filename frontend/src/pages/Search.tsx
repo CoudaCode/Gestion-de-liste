@@ -1,63 +1,29 @@
-import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { getAllLivre } from "../api/livre";
 import Input from "../components/Input";
-import Livre from "../components/Livre";
-import { LivreType } from "../types/livre";
-
+import { useAuth } from "../context/AuthProvider";
 const Search: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const router = useNavigate();
+  console.log("search", isAuthenticated);
+  // const [livres, setLivres] = useState<LivreType[]>([]);
 
-  const [livres, setLivres] = useState<LivreType[]>([]);
-
-  const [search, setSearch] = useState<string>("");
+  // const [search, setSearch] = useState<string>("");
 
   const { register, handleSubmit } = useForm();
-
-  // Initialisez livres comme un tableau vide
-  const token = Cookies.get("usertoken");
-
-  useQuery("livres", getAllLivre, {
-    onSuccess: (data) => {
-      if (data && Array.isArray(data?.message)) setLivres(data?.message);
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-  const filterBooks = (searchValue: string) => {
-    if (searchValue) {
-      return livres.filter((livre) =>
-        livre.title.toLowerCase().includes(searchValue.toLowerCase())
-      );
-    }
-    return livres;
-  };
-
   useEffect(() => {
-    if (!token) {
+    if (!isAuthenticated) {
       router("/login");
     }
-
-    const filteredBooks = filterBooks(search);
-    setLivres(filteredBooks);
-  }, [router, token, search]);
-
+  }, [isAuthenticated, router]);
   const onSubmit = (data) => {
     // Validez la valeur de recherche
     if (!data.search) {
-      // Empêchez la soumission du formulaire
       toast.error("Veuillez entrer un terme de recherche");
       return;
     }
-
-    // Filtrez les livres et mettez à jour l'état
-    const filteredBooks = filterBooks(data.search);
-    setLivres(filteredBooks);
   };
   return (
     <>
@@ -86,7 +52,7 @@ const Search: React.FC = () => {
       </h2>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-8">
-        {Array.isArray(livres) &&
+        {/* {Array.isArray(livres) &&
           livres.map((livre: LivreType) => (
             <Livre
               key={livre?._id}
@@ -95,7 +61,7 @@ const Search: React.FC = () => {
               description={livre?.content.substring(0, 20)}
               id={livre?._id as string}
             />
-          ))}
+          ))} */}
       </div>
     </>
   );

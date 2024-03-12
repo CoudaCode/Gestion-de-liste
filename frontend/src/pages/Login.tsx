@@ -1,14 +1,11 @@
-import Cookies from "js-cookie";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { login } from "../api/auth";
 import Button from "../components/Button";
 import Input from "../components/Input";
+import { useAuth } from "../context/AuthProvider";
 import { LoginFormInputs } from "../types/user";
-
 const Login: React.FC = () => {
   const styleInpt =
     "w-full rounded-lg border-green-200 p-4 pe-12 text-sm shadow-sm  bg-gray-200";
@@ -17,48 +14,57 @@ const Login: React.FC = () => {
     "inline-block rounded-lg bg-green-500 hover:bg-green-600 px-5 py-3 text-sm font-medium text-white";
   const router = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
+  const { Login } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-  const mutation = useMutation(login, {
-    onSuccess: (data) => {
-      const promise = () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve({ name: "Sonner" }), 5000)
-        );
-      if (data.statut === true) {
-        Cookies.set("usertoken", data.token, { expires: 1 });
-        toast.promise(promise, {
-          loading: "Patientez...",
-          success: () => {
-            return `Connexion reussie, vous etes connecté`;
-          },
-          error: "Error",
-        });
+  // const mutation = useMutation(login, {
+  //   onSuccess: (data) => {
+  //     const promise = () =>
+  //       new Promise((resolve) =>
+  //         setTimeout(() => resolve({ name: "Sonner" }), 5000)
+  //       );
+  //     if (data.statut === true) {
+  //       Cookies.set("usertoken", data.token, { expires: 1 });
+  //       toast.promise(promise, {
+  //         loading: "Patientez...",
+  //         success: () => {
+  //           return `Connexion reussie, vous etes connecté`;
+  //         },
+  //         error: "Error",
+  //       });
 
-        setTimeout(() => {
-          router("/search");
-        }, 5000);
-      }
+  //       setTimeout(() => {
+  //         router("/search");
+  //       }, 5000);
+  //     }
 
-      if (data.statut === false) {
-        toast.error("Email ou mot de passe incorrect", {
-          closeButton: true,
-          position: "top-center",
-        });
-      }
-    },
-    onError: (error) => {
-      console.log(error);
-      toast.error("Erreur lors de la connexion", {
-        closeButton: true,
-      });
-    },
-  });
+  //     if (data.statut === false) {
+  //       toast.error("Email ou mot de passe incorrect", {
+  //         closeButton: true,
+  //         position: "top-center",
+  //       });
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     console.log(error);
+  //     toast.error("Erreur lors de la connexion", {
+  //       closeButton: true,
+  //     });
+  //   },
+  // });
 
-  const onSubmit = (data: LoginFormInputs) => {
-    if (data.email === "" || data.password === "") {
-      toast.error("Veuillez remplir tous les champs");
+  const onSubmit = async (data: LoginFormInputs) => {
+    if (data.password === "" || data.email === "") {
+      toast.error("Veillez remplir les champs vides svp");
+      return;
     }
-    mutation.mutate(data);
+
+    try {
+      await Login(data);
+      router("/search");
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (

@@ -1,13 +1,12 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { signup } from "../api/auth";
+// import { signup } from "../api/auth";
 import Button from "../components/Button";
 import Input from "../components/Input";
+import { useAuth } from "../context/AuthProvider";
 import { SignupFormInputs } from "../types/user";
-
 const Signup: React.FC = () => {
   const styleInpt =
     "w-full rounded-lg border-green-200 p-4 pe-12 text-sm shadow-sm  bg-gray-200";
@@ -15,38 +14,38 @@ const Signup: React.FC = () => {
     "inline-block rounded-lg bg-green-500 hover:bg-green-600 px-5 py-3 text-sm font-medium text-white";
   const router = useNavigate();
   const { register, handleSubmit } = useForm<SignupFormInputs>();
+  const { signup } = useAuth();
+  // const mutation = useMutation(signup, {
+  //   onSuccess: (data) => {
+  //     console.log("data", data);
+  //     const promise = () =>
+  //       new Promise((resolve) =>
+  //         setTimeout(() => resolve({ name: "Sonner" }), 4000)
+  //       );
+  //     if (data.statut === true) {
+  //       toast.promise(promise, {
+  //         loading: "Patientez...",
+  //         success: () => {
+  //           return `Inscription reussie, vous pouvez vous connecter maintenant`;
+  //         },
+  //         error: "Error",
+  //       });
 
-  const mutation = useMutation(signup, {
-    onSuccess: (data) => {
-      console.log("data", data);
-      const promise = () =>
-        new Promise((resolve) =>
-          setTimeout(() => resolve({ name: "Sonner" }), 4000)
-        );
-      if (data.statut === true) {
-        toast.promise(promise, {
-          loading: "Patientez...",
-          success: () => {
-            return `Inscription reussie, vous pouvez vous connecter maintenant`;
-          },
-          error: "Error",
-        });
-
-        router("/login");
-      }
-      if (data.statut === false) {
-        toast.error("ce compte existe deja", {
-          closeButton: true,
-        });
-      }
-    },
-    onError: (error) => {
-      console.log(error);
-      toast.error("Erreur lors de l'inscription", {
-        closeButton: true,
-      });
-    },
-  });
+  //       router("/login");
+  //     }
+  //     if (data.statut === false) {
+  //       toast.error("ce compte existe deja", {
+  //         closeButton: true,
+  //       });
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     console.log(error);
+  //     toast.error("Erreur lors de l'inscription", {
+  //       closeButton: true,
+  //     });
+  //   },
+  // });
 
   const onSubmit = async (data: SignupFormInputs) => {
     if (
@@ -61,14 +60,20 @@ const Signup: React.FC = () => {
       });
       return;
     }
-    mutation.mutate(data);
+
+    try {
+      await signup(data);
+      router("/login");
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
     <>
       <section className="relative flex flex-wrap lg:h-screen lg:items-center">
         <div className="w-full px-4 py-12 sm:px-6 sm:py-16 lg:w-1/2 lg:px-8 lg:py-24">
-          <div className="mx-auto max-w-lg text-center">
+          <div className="max-w-lg mx-auto text-center">
             <h1 className="text-2xl font-bold sm:text-3xl">Inscription</h1>
 
             <p className="mt-4 text-gray-100">
@@ -81,7 +86,7 @@ const Signup: React.FC = () => {
           <form
             onSubmit={handleSubmit(onSubmit)}
             action="#"
-            className="mx-auto mb-0 mt-8 max-w-md space-y-4"
+            className="max-w-md mx-auto mt-8 mb-0 space-y-4"
           >
             <Input
               register={register}
@@ -145,11 +150,11 @@ const Signup: React.FC = () => {
           </form>
         </div>
 
-        <div className="relative h-64 w-full sm:h-96 lg:h-full lg:w-1/2">
+        <div className="relative w-full h-64 sm:h-96 lg:h-full lg:w-1/2">
           <img
             alt=""
             src="https://images.unsplash.com/photo-1630450202872-e0829c9d6172?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 object-cover w-full h-full"
           />
         </div>
       </section>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { commentTypes } from "../types/comment";
-const API_URL = "http://localhost:3000/api";
+import { API_URL } from "./endpoints";
 
 export const getComment = async (livreId: string, commentId: string) => {
   try {
