@@ -12,7 +12,6 @@ import ManageComments from "./pages/ManageComments";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
 import Signup from "./pages/Sign-up";
-
 // interface Props (not needed here)
 
 const App: React.FC = () => {

@@ -10,11 +10,12 @@ import {
 type Props = {
   children: React.ReactNode;
 };
+
 interface AuthContextState {
-  user: LoginResponse | null;
+  user: LoginResponse["message"] | null;
   isAuthenticated: boolean;
   setIsAuthenticated: (value: boolean) => void;
-  setUser: (user: LoginResponse | null) => void;
+  setUser: (user: LoginResponse["message"] | null) => void;
   Login: (data: LoginFormInputs) => Promise<void>;
   signup: (data: SignupFormInputs) => Promise<void>;
   logout: () => void;
@@ -22,7 +23,7 @@ interface AuthContextState {
 
 const initialState: AuthContextState = {
   user: null,
-  isAuthenticated: false,
+  isAuthenticated: Cookies.get("userConnect") !== undefined,
   setIsAuthenticated: () => {},
   setUser: () => {},
   Login: async () => {},
@@ -36,10 +37,28 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: Props) => {
-  const [user, setUser] = useState<LoginResponse | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(
+  const [user, setUser] = useState<LoginResponse["message"] | null>(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     initialState.isAuthenticated
   );
+
+  useEffect(() => {
+    const token = Cookies.get("userConnect");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   const Login = async (data: LoginFormInputs) => {
     try {
@@ -52,6 +71,7 @@ const AuthProvider = ({ children }: Props) => {
       });
 
       const result = await response.json();
+      console.log(result);
       if (response.ok) {
         setUser(result.message);
         setIsAuthenticated(true);
@@ -87,13 +107,6 @@ const AuthProvider = ({ children }: Props) => {
     setUser(null);
     setIsAuthenticated(false);
   };
-  useEffect(() => {
-    const token = Cookies.get("userConnect");
-    console.log("istoken exits", token);
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, [isAuthenticated]);
 
   return (
     <AuthContext.Provider

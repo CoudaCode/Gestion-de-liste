@@ -76,7 +76,7 @@ class UserController {
           .status(400)
           .json({ statut: false, message: "error lors de la modification" });
 
-      return res.status(200).json({
+      res.status(200).json({
         statut: true,
         message: "use modifié !!!",
       });
@@ -211,6 +211,10 @@ class UserController {
         res.status(500).json({ statut: false, message: "An error occurred" });
       }
     }
+  }
+  static async verifToken(req: Request, res: Response) {
+    try {
+    } catch (e) {}
   }
 }
 export default UserController;

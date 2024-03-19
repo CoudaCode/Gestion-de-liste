@@ -15,15 +15,12 @@ const Login: React.FC = () => {
   const router = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormInputs>();
   const { Login } = useAuth();
-  const { user } = useAuth();
-  const { isAuthenticated } = useAuth();
-
   const onSubmit = async (data: LoginFormInputs) => {
     if (data.password === "" || data.email === "") {
       toast.error("Veillez remplir les champs vides svp");
       return;
     }
-
+    console.log(data);
     try {
       await Login(data);
       router("/search");
