@@ -33,7 +33,10 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: Props) => {
-  const [user, setUser] = useState<userType | null>(null);
+  const [user, setUser] = useState<userType | null>(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     initialState.isAuthenticated
@@ -47,6 +50,14 @@ const AuthProvider = ({ children }: Props) => {
       checkValidateToken(token);
     }
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   const checkValidateToken = async (token: string) => {
     try {
