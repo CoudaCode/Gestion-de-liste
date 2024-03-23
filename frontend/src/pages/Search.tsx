@@ -1,19 +1,23 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Input from "../components/Input";
-import Livre from "../components/Livre";
 import { useAuth } from "../context/AuthProvider";
-import { LivreType } from "../types/livre";
 const Search: React.FC = () => {
-  const { user } = useAuth();
+  const router = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  // const [livres, setLivres] = useState<LivreType[]>([]);
 
-  const [livres, setLivres] = useState<LivreType[]>([]);
-
-  const [search, setSearch] = useState<string>("");
+  // const [search, setSearch] = useState<string>("");
 
   const { register, handleSubmit } = useForm();
-  console.log("user", user);
+  console.log("userSearch", user);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router("/login");
+    }
+  }, [isAuthenticated, router]);
   const onSubmit = (data) => {
     // Validez la valeur de recherche
     if (!data.search) {
@@ -49,7 +53,7 @@ const Search: React.FC = () => {
       </h2>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-8">
-        {(Array.isArray(livres) &&
+        {/* {(Array.isArray(livres) &&
           livres.map((livre: LivreType) => (
             <Livre
               key={livre?._id}
@@ -58,7 +62,7 @@ const Search: React.FC = () => {
               description={livre?.content.substring(0, 20)}
               id={livre?._id as string}
             />
-          ))) || <p>Aucun résultat</p>}
+          ))) || <p>Aucun résultat</p>} */}
       </div>
     </>
   );

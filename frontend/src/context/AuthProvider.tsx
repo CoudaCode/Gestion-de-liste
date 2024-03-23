@@ -1,21 +1,17 @@
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect, useState } from "react";
 import { API_URL } from "../api/endpoints";
-import {
-  LoginFormInputs,
-  LoginResponse,
-  SignupFormInputs,
-} from "./../types/user";
+import { LoginFormInputs, SignupFormInputs, userType } from "./../types/user";
 
 type Props = {
   children: React.ReactNode;
 };
 
 interface AuthContextState {
-  user: LoginResponse["message"] | null;
+  user: userType | null;
   isAuthenticated: boolean;
   setIsAuthenticated: (value: boolean) => void;
-  setUser: (user: LoginResponse["message"] | null) => void;
+  setUser: (user: userType | null) => void;
   Login: (data: LoginFormInputs) => Promise<void>;
   signup: (data: SignupFormInputs) => Promise<void>;
   logout: () => void;
@@ -37,28 +33,45 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: Props) => {
-  const [user, setUser] = useState<LoginResponse["message"] | null>(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [user, setUser] = useState<userType | null>(null);
+
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     initialState.isAuthenticated
   );
 
   useEffect(() => {
     const token = Cookies.get("userConnect");
+
     if (token) {
-      setIsAuthenticated(true);
+      // Vérifier la validité du token et récupérer les données de l'utilisateur
+      checkValidateToken(token);
     }
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
+  const checkValidateToken = async (token: string) => {
+    try {
+      const response = await fetch(`${API_URL}/user/check-token`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        console.log(userData);
+        setUser(userData); // Mettez à jour les informations de l'utilisateur si le token est valide
+        setIsAuthenticated(true);
+      } else {
+        logout();
+      }
+    } catch (error) {
+      console.error("Erreur lors de la validation du token :", error);
+      // Déconnectez l'utilisateur en cas d'erreur
+      logout();
     }
-  }, [user]);
+  };
 
   const Login = async (data: LoginFormInputs) => {
     try {
@@ -71,11 +84,10 @@ const AuthProvider = ({ children }: Props) => {
       });
 
       const result = await response.json();
-      console.log(result);
       if (response.ok) {
         setUser(result.message);
         setIsAuthenticated(true);
-        Cookies.set("userConnect", result.token, { expires: 1 });
+        Cookies.set("userConnect", result.token);
       }
 
       return result;
@@ -95,7 +107,6 @@ const AuthProvider = ({ children }: Props) => {
       });
 
       const result = await response.json();
-      console.log(result);
       return result;
     } catch (e) {
       console.error(e);

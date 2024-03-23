@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AuthRequest } from "../interface/authRequest";
 import { compareMdpHash, hasHMdp } from "../utils/Hash";
 import { MailOptions, sendEmail } from "../utils/sendMail";
-import { generateToken } from "../utils/token";
+import { generateToken, tokenVerify } from "../utils/token";
 import { IUser, User } from "./../models/users";
 class UserController {
   static async createUser(req: Request, res: Response) {
@@ -212,9 +212,32 @@ class UserController {
       }
     }
   }
-  static async verifToken(req: Request, res: Response) {
+  static async checkValidateToken(req: Request, res: Response) {
     try {
-    } catch (e) {}
+      const token =
+        req.headers.authorization?.split(" ")[1] || req.cookies.token;
+
+      if (!token) {
+        return res.status(401).json({ message: "Token non fourni" });
+      }
+
+      // Utilisez votre fonction pour vérifier le token
+      const userData = tokenVerify(token);
+
+      if (userData) {
+        // Token valide, renvoyez les informations de l'utilisateur
+        return res.status(200).json(userData);
+      } else {
+        // Token invalide ou expiré
+        return res.status(401).json({ message: "Token invalide ou expiré" });
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        res.status(500).json({ statut: false, message: e.message });
+      } else {
+        res.status(500).json({ statut: false, message: "An error occurred" });
+      }
+    }
   }
 }
 export default UserController;
