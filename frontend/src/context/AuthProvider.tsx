@@ -15,6 +15,7 @@ interface AuthContextState {
   Login: (data: LoginFormInputs) => Promise<void>;
   signup: (data: SignupFormInputs) => Promise<void>;
   logout: () => void;
+  isLoading: boolean;
 }
 
 const initialState: AuthContextState = {
@@ -25,6 +26,7 @@ const initialState: AuthContextState = {
   Login: async () => {},
   signup: async () => {},
   logout: () => {},
+  isLoading: false,
 };
 
 export const AuthContext = createContext<AuthContextState>(initialState);
@@ -37,6 +39,7 @@ const AuthProvider = ({ children }: Props) => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     initialState.isAuthenticated
@@ -61,6 +64,7 @@ const AuthProvider = ({ children }: Props) => {
 
   const checkValidateToken = async (token: string) => {
     try {
+      setIsLoading(true);
       const response = await fetch(`${API_URL}/user/check-token`, {
         method: "POST",
         headers: {
@@ -74,18 +78,23 @@ const AuthProvider = ({ children }: Props) => {
         console.log(userData);
         setUser(userData); // Mettez à jour les informations de l'utilisateur si le token est valide
         setIsAuthenticated(true);
+        setIsLoading(false);
       } else {
         logout();
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la validation du token :", error);
       // Déconnectez l'utilisateur en cas d'erreur
+
       logout();
+      setIsLoading(false);
     }
   };
 
   const Login = async (data: LoginFormInputs) => {
     try {
+      setIsLoading(true);
       const response = await fetch(`${API_URL}/user/login`, {
         body: JSON.stringify(data),
         headers: {
@@ -94,21 +103,29 @@ const AuthProvider = ({ children }: Props) => {
         method: "POST",
       });
 
-      const result = await response.json();
-      if (response.ok) {
-        setUser(result.message);
-        setIsAuthenticated(true);
-        Cookies.set("userConnect", result.token);
+      if (!response.ok) {
+        // Si la réponse de l'API indique un échec (code d'état HTTP différent de 2xx), traiter l'erreur
+        const errorMessage = await response.json();
+        throw new Error(
+          errorMessage.message || "Email ou mot de passe incorrect."
+        );
       }
-
+      const result = await response.json();
+      setUser(result.message);
+      setIsAuthenticated(true);
+      Cookies.set("userConnect", result.token);
+      setIsLoading(false);
       return result;
-    } catch (e) {
-      return Promise.reject(e);
+    } catch (error) {
+      setIsLoading(false);
+
+      return Promise.reject(error);
     }
   };
 
   const signup = async (data: SignupFormInputs) => {
     try {
+      setIsLoading(true);
       const response = await fetch(`${API_URL}/user/`, {
         body: JSON.stringify(data),
         headers: {
@@ -117,10 +134,18 @@ const AuthProvider = ({ children }: Props) => {
         method: "POST",
       });
 
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        console.log(errorMessage);
+        throw new Error(errorMessage.message || "Ce compte existe déja.");
+      }
+      console.log(response);
       const result = await response.json();
+      setIsLoading(false);
       return result;
     } catch (e) {
-      console.error(e);
+      setIsLoading(false);
+      return Promise.reject(e);
     }
   };
 
@@ -139,6 +164,7 @@ const AuthProvider = ({ children }: Props) => {
         setUser,
         Login,
         signup,
+        isLoading,
         logout,
       }}
     >

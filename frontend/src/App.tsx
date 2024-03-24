@@ -12,6 +12,7 @@ import ManageComments from "./pages/ManageComments";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
 import Signup from "./pages/Sign-up";
+import Loader from "./components/Loader";
 // interface Props (not needed here)
 
 const App: React.FC = () => {
@@ -32,6 +33,7 @@ const App: React.FC = () => {
             <Route path="/signup" element={<Signup />} />
             <Route path="/book-details/:id" element={<BookDetails />} />
             <Route path="/manage-comment" element={<ManageComments />} />
+            <Route path="/loader" element={<Loader />} />
           </Routes>
         </AuthProvider>
       </QueryClientProvider>

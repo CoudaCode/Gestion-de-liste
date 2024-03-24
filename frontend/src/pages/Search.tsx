@@ -6,13 +6,12 @@ import Input from "../components/Input";
 import { useAuth } from "../context/AuthProvider";
 const Search: React.FC = () => {
   const router = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   // const [livres, setLivres] = useState<LivreType[]>([]);
 
   // const [search, setSearch] = useState<string>("");
 
   const { register, handleSubmit } = useForm();
-  console.log("userSearch", user);
   useEffect(() => {
     if (!isAuthenticated) {
       router("/login");
