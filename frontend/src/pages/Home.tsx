@@ -28,7 +28,7 @@ const Home: React.FC = () => {
           <Button
             text="Se connecter"
             type="button"
-            link="/signup"
+            link="/login"
             className="block w-full mt-2 py-2.5 px-8 text-gray-300 bg-gray-700 rounded-md duration-150 hover:bg-gray-800 sm:w-auto"
           />
         </div>

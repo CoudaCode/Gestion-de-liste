@@ -48,8 +48,9 @@ const Signup: React.FC = () => {
         <section className="relative flex flex-wrap lg:h-screen lg:items-center">
           <div className="w-full px-4 py-12 sm:px-6 sm:py-16 lg:w-1/2 lg:px-8 lg:py-24">
             <div className="max-w-lg mx-auto text-center">
-              <h1 className="text-3xl font-bold sm:text-3xl">Inscription</h1>
-
+              <h1 className="text-2xl font-bold sm:text-3xl text-gray-400">
+                INSCRIPTION
+              </h1>
               <p className="mt-4 text-gray-100">
                 Bienvenue sur notre plateforme de gestion de livres.
                 Connectez-vous pour accéder à notre catalogue et commencer à

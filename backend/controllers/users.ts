@@ -65,7 +65,7 @@ class UserController {
       if (newPassword) {
         updateUser = await User.updateOne(
           { _id: id },
-          { password: await hasHMdp(newPassword), ...body }
+          { password: await hasHMdp(newPassword), ...body },
         );
       } else {
         updateUser = await User.updateOne({ _id: id }, { ...body });
@@ -152,7 +152,7 @@ class UserController {
         });
         return res.status(200).json({
           statut: true,
-          message: { ...exist.toObject() },
+          message: { ...exist.toObject(), password: undefined },
           token: generateToken(exist.toObject()),
         });
       }
@@ -186,7 +186,7 @@ class UserController {
 
       await User.updateOne(
         { _id: user._id },
-        { password: await hasHMdp(req.body.password) }
+        { password: await hasHMdp(req.body.password) },
       );
       const myEmail: string = process.env.email || "";
       const resetPasswordEmail: MailOptions = {
@@ -224,12 +224,22 @@ class UserController {
       // Utilisez votre fonction pour vérifier le token
       const userData = tokenVerify(token);
 
-      if (userData) {
+      if (typeof userData === "object" && userData) {
         // Token valide, renvoyez les informations de l'utilisateur
-        return res.status(200).json(userData);
+        return res.status(200).json({
+          statut: true,
+          message: {
+            ...userData,
+            iat: undefined,
+            exp: undefined,
+            password: undefined,
+          },
+        });
       } else {
         // Token invalide ou expiré
-        return res.status(401).json({ message: "Token invalide ou expiré" });
+        return res
+          .status(401)
+          .json({ statut: false, message: "Token invalide ou expiré" });
       }
     } catch (e) {
       if (e instanceof Error) {
